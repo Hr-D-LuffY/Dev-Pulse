@@ -2,10 +2,7 @@ import type { Request, Response } from "express";
 import sendResponse from "../../utility/sendresponse";
 import { authService } from "./auth.service";
 
-
 const signup = async (req: Request, res: Response) => {
-	console.log(req.body);
-
 	try {
 		const result = await authService.signupUserIntoDB(req.body);
 		sendResponse(res, {

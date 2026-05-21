@@ -5,6 +5,7 @@ import express, {
 } from "express";
 import config from "./config";
 import { initDB } from "./db";
+import { authRoute } from "./modules/auth/auth.route";
 
 const app: Application = express();
 const port = config.port;
@@ -14,8 +15,13 @@ app.use(express.text());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req: Request, res: Response) => {
-	res.send("Hello World!");
+	res.status(200).json({
+		message: "Express Server",
+		project: "Dev Pulse",
+	});
 });
+
+app.use('/api/auth', authRoute )
 
 initDB();
 app.listen(port, () => {

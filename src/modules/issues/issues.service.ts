@@ -1,4 +1,5 @@
 import { pool } from "../../db";
+import type { IUpdateIssue } from "./issues.iterface";
 
 const createIssueIntoDB = async (body: {
 	title: string;
@@ -100,30 +101,28 @@ const deleteIssueFromDB = async (id: string) => {
 	return result;
 };
 
-// const updateUserFromDB = async (payload: IUser, id: string) => {
-// 	const { name, password, age, is_active } = payload;
+const updateIssueIntoDB = async (issueId: string, payload: IUpdateIssue) => {
+	const { title, description, type } = payload;
+	const updateResult = await pool.query(
+		`UPDATE issues SET
+      title       = COALESCE($1, title),
+      description = COALESCE($2, description),
+      type        = COALESCE($3, type),
+      updated_at  = NOW()
+     WHERE id = $4
+     RETURNING *`,
+		[title, description, type, issueId],
+	);
 
-// 	const result = await pool.query(
-// 		`
-//     UPDATE users
-//     SET
-//     name=COALESCE($1,name),
-//     password=COALESCE($2,password),
-//     age=COALESCE($3,age),
-//     is_active=COALESCE($4,is_active)
+	if (!updateResult.rows[0]) throw new Error("Issue not found");
 
-//     WHERE id=$5 RETURNING *
-//     `,
-// 		[name, password, age, is_active, id],
-// 	);
-
-// 	return result;
-// };
+	return updateResult.rows[0];
+};
 
 export const issueService = {
 	createIssueIntoDB,
 	getAllIssuesFromDB,
 	getSingleIssueFromDB,
-	// updateUserFromDB,
+	updateIssueIntoDB,
 	deleteIssueFromDB,
 };

@@ -11,9 +11,14 @@ router.post(
 	authorize(USER_ROLE.contributor, USER_ROLE.maintainer),
 	issuesController.createIssue,
 );
-router.get("/", issuesController.getAllIssue); //?sort=newest
+router.get("/", issuesController.getAllIssue);
 router.get("/:id", issuesController.getSingleIssue);
-// router.patch("/:id", issuesController.jid);
+router.patch(
+	"/:id",
+	authenticate,
+	authorize("contributor", "maintainer"),
+	issuesController.updateIssue,
+);
 router.delete(
 	"/:id",
 	authenticate,

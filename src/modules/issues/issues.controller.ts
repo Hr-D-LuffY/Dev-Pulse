@@ -72,6 +72,52 @@ const getSingleIssue = async (req: Request, res: Response) => {
 	}
 };
 
+const updateIssue = async (req: Request, res: Response) => {
+	try {
+		const issueId = req.params.id;
+		const userId = req.user!.id;
+		const role = req.user!.role;
+
+		if (role === "contributor") {
+			const issue = await issueService.getSingleIssueFromDB(issueId as string);
+
+			if (issue.reporter.id !== userId) {
+				return sendResponse(res, {
+					statusCode: 403,
+					success: false,
+					message: "You can only update your own issues",
+				});
+			}
+			if (issue.status !== "open") {
+				return sendResponse(res, {
+					statusCode: 403,
+					success: false,
+					message: "Contributors can only update issues with open status",
+				});
+			}
+		}
+
+		const result = await issueService.updateIssueIntoDB(
+			issueId as string,
+			req.body,
+		);
+
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: "Issue updated successfully",
+			data: result,
+		});
+	} catch (error: any) {
+		sendResponse(res, {
+			statusCode: 500,
+			success: false,
+			message: error.message,
+			error: error,
+		});
+	}
+};
+
 const deleteIssue = async (req: Request, res: Response) => {
 	const { id } = req.params;
 
@@ -103,5 +149,6 @@ export const issuesController = {
 	createIssue,
 	getAllIssue,
 	getSingleIssue,
-    deleteIssue
+	updateIssue,
+	deleteIssue,
 };

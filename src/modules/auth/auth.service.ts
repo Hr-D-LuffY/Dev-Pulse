@@ -1,6 +1,6 @@
 import config from "../../config";
 import { pool } from "../../db";
-import type { Iuser } from "./auth.interface";
+import type { Iuser, IuserLogin } from "./auth.interface";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -16,15 +16,11 @@ const signupUserIntoDB = async (payload: Iuser) => {
 		[name, email, hashpassword, role ?? "contributor"],
 	);
 
-	delete result.rows[0].password;
-
-	return result;
+	const { password: _, ...safeUser } = result.rows[0];
+	return safeUser;
 };
 
-const loginUserIntoDB = async (payload: {
-	email: string;
-	password: string;
-}) => {
+const loginUserIntoDB = async (payload: IuserLogin) => {
 	const { email, password } = payload;
 
 	const userData = await pool.query(
@@ -54,8 +50,8 @@ const loginUserIntoDB = async (payload: {
 		expiresIn: "1d",
 	});
 
-	delete userData.rows[0].password;
-	return { token: accessToken, user: userData.rows[0] };
+	const { password: _, ...safeUser } = user;
+	return { token: accessToken, user: safeUser };
 };
 
 export const authService = {

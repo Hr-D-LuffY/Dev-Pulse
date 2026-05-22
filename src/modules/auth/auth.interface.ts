@@ -4,3 +4,7 @@ export interface Iuser {
 	password: string;
 	role?: string;
 }
+export interface IuserLogin {
+	email: string;
+	password: string;
+}

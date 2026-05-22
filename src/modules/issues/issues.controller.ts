@@ -39,6 +39,7 @@ const getAllIssue = async (req: Request, res: Response) => {
 		sendResponse(res, {
 			statusCode: 200,
 			success: true,
+			message: "Issue Fetched Successfully!",
 			data: result,
 		});
 	} catch (error: any) {
@@ -60,6 +61,7 @@ const getSingleIssue = async (req: Request, res: Response) => {
 		sendResponse(res, {
 			statusCode: 200,
 			success: true,
+			message: "Issue Fetched Successfully!",
 			data: result,
 		});
 	} catch (error: any) {
@@ -125,9 +127,10 @@ const deleteIssue = async (req: Request, res: Response) => {
 		const result = await issueService.deleteIssueFromDB(id as string);
 
 		if (result.rowCount === 0) {
-			res.status(404).json({
+			return sendResponse(res, {
+				statusCode: 404,
 				success: false,
-				message: "Issue Not found!",
+				message: "Issue not found",
 			});
 		}
 		sendResponse(res, {

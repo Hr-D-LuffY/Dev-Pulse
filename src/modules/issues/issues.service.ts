@@ -1,12 +1,7 @@
 import { pool } from "../../db";
-import type { IUpdateIssue } from "./issues.iterface";
+import type { ICreateIssue, IIssueFilters, IIssueRow, IUpdateIssue } from "./issues.iterface";
 
-const createIssueIntoDB = async (body: {
-	title: string;
-	description: string;
-	type: string;
-	reporter_id: number;
-}) => {
+const createIssueIntoDB = async (body: ICreateIssue) => {
 	const { title, description, type, reporter_id } = body;
 
 	const result = await pool.query(
@@ -19,15 +14,11 @@ const createIssueIntoDB = async (body: {
 	return result.rows[0];
 };
 
-const getAllIssuesFromDB = async (filters: {
-	type?: string;
-	status?: string;
-	sort?: string;
-}) => {
+const getAllIssuesFromDB = async (filters: IIssueFilters ) => {
 	const { type, status, sort } = filters;
 
 	const conditions: string[] = [];
-	const values: any[] = [];
+	const values: string[] = [];
 
 	if (type) {
 		conditions.push(`type = $${values.length + 1}`);
@@ -49,9 +40,6 @@ const getAllIssuesFromDB = async (filters: {
 		values,
 	);
 
-	const issue = issueResult.rows.length;
-	if (issue <= 0) throw new Error("Issue not found");
-
 	return await Promise.all(
 		issueResult.rows.map((issue) => formatIssueWithReporter(issue)),
 	);
@@ -70,7 +58,7 @@ const getSingleIssueFromDB = async (id: string) => {
 	return await formatIssueWithReporter(issue);
 };
 
-const formatIssueWithReporter = async (issue: any) => {
+const formatIssueWithReporter = async (issue: IIssueRow) => {
 	const userResult = await pool.query(
 		`SELECT id, name, role FROM users WHERE id = $1`,
 		[issue.reporter_id],

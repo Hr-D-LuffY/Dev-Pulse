@@ -9,7 +9,7 @@ const signup = async (req: Request, res: Response) => {
 			statusCode: 201,
 			success: true,
 			message: "User Registered Successfully!",
-			data: result.rows[0],
+			data: result,
 		});
 	} catch (error: any) {
 		sendResponse(res, {

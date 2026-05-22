@@ -57,9 +57,11 @@ const getAllIssuesFromDB = async (filters: {
 };
 
 const getSingleIssueFromDB = async (id: string) => {
-	const issueResult = await pool.query(`SELECT * FROM issues WHERE id = $1`, [
-		id,
-	]);
+	const issueResult = await pool.query(
+		`
+        SELECT * FROM issues WHERE id = $1`,
+		[id],
+	);
 	const issue = issueResult.rows[0];
 
 	if (!issue) throw new Error("Issue not found");
@@ -88,6 +90,16 @@ const formatIssueWithReporter = async (issue: any) => {
 	};
 };
 
+const deleteIssueFromDB = async (id: string) => {
+	const result = await pool.query(
+		`
+    DELETE FROM issues WHERE id=$1
+      `,
+		[id],
+	);
+	return result;
+};
+
 // const updateUserFromDB = async (payload: IUser, id: string) => {
 // 	const { name, password, age, is_active } = payload;
 
@@ -108,20 +120,10 @@ const formatIssueWithReporter = async (issue: any) => {
 // 	return result;
 // };
 
-// const deleteUserFromDB = async (id: string) => {
-// 	const result = await pool.query(
-// 		`
-//     DELETE FROM users WHERE id=$1
-//       `,
-// 		[id],
-// 	);
-// 	return result;
-// };
-
 export const issueService = {
 	createIssueIntoDB,
 	getAllIssuesFromDB,
 	getSingleIssueFromDB,
 	// updateUserFromDB,
-	// deleteUserFromDB,
+	deleteIssueFromDB,
 };

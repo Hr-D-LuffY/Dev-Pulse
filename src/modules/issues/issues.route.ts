@@ -14,6 +14,11 @@ router.post(
 router.get("/", issuesController.getAllIssue); //?sort=newest
 router.get("/:id", issuesController.getSingleIssue);
 // router.patch("/:id", issuesController.jid);
-// router.delete("/:id", issuesController.jid);
+router.delete(
+	"/:id",
+	authenticate,
+	authorize(USER_ROLE.maintainer),
+	issuesController.deleteIssue,
+);
 
 export const issuesRoute = router;

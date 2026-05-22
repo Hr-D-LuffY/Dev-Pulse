@@ -12,7 +12,7 @@ router.post(
 	issuesController.createIssue,
 );
 // router.get("/", issuesController.jid);?sort=newest
-// router.get("/:id", issuesController.jid);
+router.get("/:id", issuesController.getSingleIssue);
 // router.patch("/:id", issuesController.jid);
 // router.delete("/:id", issuesController.jid);
 

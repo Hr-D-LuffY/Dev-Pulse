@@ -18,20 +18,39 @@ const createIssueIntoDB = async (body: {
 	return result.rows[0];
 };
 
+const getSingleIssueFromDB = async (id: string) => {
+	const issueResult = await pool.query(`SELECT * FROM issues WHERE id = $1`, [
+		id,
+	]);
+	const issue = issueResult.rows[0];
+
+	if (!issue) throw new Error("Issue not found");
+
+	const userResult = await pool.query(
+		`SELECT id, name, role FROM users WHERE id = $1`,
+		[issue.reporter_id],
+	);
+	const reporter = userResult.rows[0];
+
+
+	const { reporter_id: _, created_at, updated_at, ...rest } = issue;
+
+	return {
+		...rest,
+		reporter: {
+			id: reporter.id,
+			name: reporter.name,
+			role: reporter.role,
+		},
+		created_at,
+		updated_at,
+	};
+};
+
 // const getAllUsersFromDB = async () => {
 // 	const result = await pool.query(`
 //       SELECT * FROM users
 //         `);
-// 	return result;
-// };
-
-// const getSingleUserFromDB = async (id: string) => {
-// 	const result = await pool.query(
-// 		`
-//       SELECT * FROM users WHERE id=$1
-//         `,
-// 		[id],
-// 	);
 // 	return result;
 // };
 
@@ -68,7 +87,7 @@ const createIssueIntoDB = async (body: {
 export const issueService = {
 	createIssueIntoDB,
 	// getAllUsersFromDB,
-	// getSingleUserFromDB,
+	getSingleIssueFromDB,
 	// updateUserFromDB,
 	// deleteUserFromDB,
 };

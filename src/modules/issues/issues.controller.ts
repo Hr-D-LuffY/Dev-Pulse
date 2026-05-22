@@ -3,7 +3,6 @@ import sendResponse from "../../utility/sendresponse";
 import { issueService } from "./issues.service";
 
 const createIssue = async (req: Request, res: Response) => {
-	console.log(req.user!.id);
 	try {
 		const reporter_id = req.user!.id;
 
@@ -28,6 +27,28 @@ const createIssue = async (req: Request, res: Response) => {
 	}
 };
 
+const getSingleIssue = async (req: Request, res: Response) => {
+	const { id } = req.params;
+	try {
+		const result = await issueService.getSingleIssueFromDB(id as string);
+
+		// console.log(result.rows[0].reporter_id);
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			data: result,
+		});
+	} catch (error: any) {
+		sendResponse(res, {
+			statusCode: 500,
+			success: false,
+			message: error.message,
+			error: error,
+		});
+	}
+};
+
 export const issuesController = {
 	createIssue,
+	getSingleIssue,
 };
